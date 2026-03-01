@@ -722,7 +722,6 @@ Use only when:
 
 ---
 
-
 **Functional Dependency (FD)**
 
 ---
@@ -740,22 +739,36 @@ FD is the tool to detect and remove redundancy.
 If I know column A, can I uniquely find column B in the real world?”
 
 If YES → FD exists.
-Example 1:
+
+---
+
+**Example 1:**
+
 | StudentID | StudentName |
-If I know StudentID, can I uniquely know StudentName?
+|-----------|-------------|
+
+If I know StudentID, can I uniquely know StudentName?  
 Yes → StudentID → StudentName
 
-Example 2:
+---
+
+**Example 2:**
+
 | StudentName | Dept |
-If I know StudentName, can I uniquely know Dept?
-Not always (two Ravi may exist)
+|-------------|------|
+
+If I know StudentName, can I uniquely know Dept?  
+Not always (two Ravi may exist)  
 So no FD.
+
 ---
 
 Redundancy happens when we store an attribute in a table where its determinant is not the key.
 
 This is the heart of normalization.
+
 ---
+
 **Types of Functional Dependency**
 
 ---
@@ -826,9 +839,11 @@ A → 999,888
 ---
 
 **Second Normal Form (2NF)**
+
 When to check?
 
 👉 Only when composite key exists.
+
 ✔ **Preconditions:**
 
 - Must already be in 1NF  
@@ -913,11 +928,15 @@ Here:
 👉 violates BCNF  
 👉 may still satisfy 3NF  
 
+---
+
 | Student | Subject | Teacher |
-| ------- | ------- | ------- |
+|---------|---------|---------|
 | Ravi    | DBMS    | Smith   |
 | Priya   | DBMS    | Smith   |
 | Ravi    | OS      | John    |
+
+---
 
 Try Teacher alone
 
@@ -925,9 +944,10 @@ Look at Teacher = Smith.
 
 Rows:
 
-Student	Subject	Teacher
-Ravi	DBMS	Smith
-Priya	DBMS	Smith
+| Student | Subject | Teacher |
+|---------|---------|---------|
+| Ravi    | DBMS    | Smith   |
+| Priya   | DBMS    | Smith   |
 
 👉 Same teacher appears in multiple rows.
 
@@ -936,23 +956,24 @@ Priya	DBMS	Smith
 Therefore:
 
 ❌ Teacher is NOT a super key.
+
+---
+
 Try (Student, Teacher):
 
 | Student | Teacher | → unique row? |
+|---------|---------|---------------|
 
 Check:
 
-Ravi + Smith → one row
-
-Priya + Smith → different row
+Ravi + Smith → one row  
+Priya + Smith → different row  
 
 ✅ Works.
 
 So candidate key = (Student, Teacher)
 
 ---
-
-
 
 **What is a Transaction?**
 
