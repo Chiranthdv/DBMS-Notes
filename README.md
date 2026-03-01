@@ -721,3 +721,407 @@ Use only when:
 👉 Add relationship attributes  
 
 ---
+
+
+**Functional Dependency (FD)**
+
+---
+
+A functional dependency  
+𝐴→𝐵  
+A→B means:
+
+If two rows have the same value of A, they must have the same value of B.
+
+A = determinant  
+B = dependent  
+FD is the tool to detect and remove redundancy.
+
+If I know column A, can I uniquely find column B in the real world?”
+
+If YES → FD exists.
+Example 1:
+| StudentID | StudentName |
+If I know StudentID, can I uniquely know StudentName?
+Yes → StudentID → StudentName
+
+Example 2:
+| StudentName | Dept |
+If I know StudentName, can I uniquely know Dept?
+Not always (two Ravi may exist)
+So no FD.
+---
+
+Redundancy happens when we store an attribute in a table where its determinant is not the key.
+
+This is the heart of normalization.
+---
+**Types of Functional Dependency**
+
+---
+
+**1️⃣ Trivial FD**
+
+**Rule:**
+
+𝐴 → 𝐵 is trivial if 𝐵 ⊆ 𝐴  
+A→B is trivial if B ⊆ A
+
+✅ **Example:**
+
+{EmpID, Name} → EmpID  
+
+Because EmpID is already part of left side
+
+---
+
+**Non-Trivial FD**
+
+**Rule:**
+
+𝐴 → 𝐵 is non-trivial if 𝐵 ⊄ 𝐴  
+A→B is non-trivial if B ⊄ A
+
+✅ **Example:**
+
+EmpID → Name
+
+---
+
+**Normalization**
+
+---
+
+**Main goal:**
+
+Reduce redundancy and remove anomalies.
+
+**Three anomalies:**
+
+- Insertion anomaly  
+- Deletion anomaly  
+- Update anomaly  
+
+---
+
+**Normal Forms**
+
+---
+
+**First Normal Form (1NF)**
+
+✔ **Rule:**
+
+- No multivalued attributes  
+- Each cell must be atomic (single value)  
+- No repeating groups  
+
+✅ **Example violation:**
+
+Student Phones  
+A → 999,888  
+
+✔ **Fix →** split rows or new table.
+
+---
+
+**Second Normal Form (2NF)**
+When to check?
+
+👉 Only when composite key exists.
+✔ **Preconditions:**
+
+- Must already be in 1NF  
+
+✔ **Rule:**
+
+No partial dependency
+
+**Meaning:**
+
+Every non-prime attribute must depend on the whole primary key, not part of it.
+
+---
+
+**Third Normal Form (3NF)**
+
+You were close but slightly messy. Here's the clean rule.
+
+✔ **Preconditions:**
+
+- Must be in 2NF  
+
+✔ **Rule:**
+
+No transitive dependency of non-prime attributes on key.
+
+**Formally:**
+
+For every FD 𝐴 → 𝐵:
+
+At least one must be true:
+
+- A is superkey, OR  
+- B is prime attribute  
+
+---
+
+✅ **Transitive dependency**
+
+𝐴 → 𝐵, 𝐵 → 𝐶  
+Then:  
+𝐴 → 𝐶  
+
+If B and C are non-prime → violates 3NF.
+
+---
+
+**BCNF Rule (VERY IMPORTANT)**
+
+---
+
+For every functional dependency:
+
+𝐴 → 𝐵  
+
+A must be a superkey
+
+---
+
+**Why BCNF is stronger than 3NF**
+
+3NF allows some cases where determinant is not superkey.
+
+---
+
+**Classic example (important)**
+
+Relation:
+
+(Student, Course, Instructor)
+
+FDs:
+
+(Student, Course) → Instructor  
+Instructor → Course ❌  
+
+Here:
+
+- Instructor is not superkey  
+- But determines Course  
+
+👉 violates BCNF  
+👉 may still satisfy 3NF  
+
+| Student | Subject | Teacher |
+| ------- | ------- | ------- |
+| Ravi    | DBMS    | Smith   |
+| Priya   | DBMS    | Smith   |
+| Ravi    | OS      | John    |
+
+Try Teacher alone
+
+Look at Teacher = Smith.
+
+Rows:
+
+Student	Subject	Teacher
+Ravi	DBMS	Smith
+Priya	DBMS	Smith
+
+👉 Same teacher appears in multiple rows.
+
+🚨 So Teacher alone CANNOT uniquely identify a row.
+
+Therefore:
+
+❌ Teacher is NOT a super key.
+Try (Student, Teacher):
+
+| Student | Teacher | → unique row? |
+
+Check:
+
+Ravi + Smith → one row
+
+Priya + Smith → different row
+
+✅ Works.
+
+So candidate key = (Student, Teacher)
+
+---
+
+
+
+**What is a Transaction?**
+
+---
+
+A transaction is a logical unit of work that consists of one or more database operations and must be executed completely or not at all.
+
+---
+
+**Example (Money Transfer — BEST)**
+
+---
+
+Suppose person A transfers ₹100 to person B.
+
+**Transaction steps:**
+
+- Read A balance  
+- Deduct ₹100 from A  
+- Write A balance  
+- Read B balance  
+- Add ₹100 to B  
+- Write B balance  
+
+👉 All these steps together form one transaction.
+
+If any step fails → entire transaction must be undone.
+
+---
+
+**ACID Properties**
+
+---
+
+**A — Atomicity (All or Nothing)**
+
+**Meaning:**
+
+Either the entire transaction executes or none of it executes.
+
+✅ No partial updates allowed.  
+If any part of the transaction fails, the DBMS performs a rollback to undo all previous operations.
+
+**Example**
+
+If system crashes after deducting money from A but before adding to B:
+
+❌ WRONG state  
+✅ DBMS must rollback A’s deduction.
+
+---
+
+**C — Consistency (Valid → Valid)**
+
+After a transaction, the database must remain in a valid state satisfying all constraints.
+
+💡 **Example**
+
+Suppose rule:
+
+Total money in system must remain constant.
+
+**Before transfer:**
+
+- A = 1000  
+- B = 2000  
+- Total = 3000  
+
+**After transfer:**
+
+- A = 900  
+- B = 2100  
+- Total = 3000 ✅ valid state  
+
+If total becomes 2900 ❌ → consistency violated.
+
+🎯 **Interview one-liner**
+
+Consistency ensures the database moves from one valid state to another valid state.
+
+---
+
+**I — Isolation**
+
+Concurrent transactions should not interfere with each other’s intermediate states.
+
+**Your GPay example (refined)**
+
+Two transactions start:
+
+- T1 (GPay)  
+- T2 (Net banking)  
+
+Both read balance = 1000.
+
+If isolation is weak:
+
+- Both deduct 100  
+- Final balance becomes wrong  
+
+Each transaction behaves as if it is running alone.
+
+DBMS uses:
+
+- locks  
+
+Isolation ensures that concurrent transactions execute without affecting each other’s intermediate results.
+
+---
+
+**D — Durability**
+
+Once a transaction is committed, its changes are permanently stored even if the system crashes.
+
+Once the transaction is committed, even if the system crashes, the changes must persist.
+
+**Example**
+
+User gets message:
+
+✅ "Payment successful"
+
+Immediately system crashes.
+
+After restart → money must still be transferred.
+
+---
+
+**Transaction States (Clean Flow)**
+
+---
+
+🔹 **1. Active**
+
+- Transaction is executing  
+- Read/write happening  
+
+---
+
+🔹 **2. Partially Committed**
+
+- Last statement executed  
+- Commit not yet fully guaranteed  
+- Still vulnerable  
+
+---
+
+🔹 **3. Committed**
+
+- All changes permanently recorded  
+- Success  
+
+---
+
+🔹 **4. Failed**
+
+- Error occurred  
+- Cannot proceed  
+
+---
+
+🔹 **5. Aborted**
+
+- All changes rolled back  
+- Database restored to previous state  
+
+---
+
+🔹 **6. Terminated**
+
+- Transaction leaves the system  
+- Final state (after commit or abort)
